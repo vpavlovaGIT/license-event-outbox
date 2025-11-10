@@ -40,6 +40,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  license-service:
+    build: .
+    container_name: license-service
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/licenses
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP-SERVERS: kafka:9092
+    ports:
+      - "8080:8080"
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
