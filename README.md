@@ -1,22 +1,6 @@
 # License Kafka Service
 
-Микросервис для обработки событий о лицензиях ПО, получаемых из Kafka или через REST API.  
-Использует **паттерн Outbox** — все входящие сообщения сначала сохраняются в таблицу `outbox_event`, а затем асинхронно обрабатываются планировщиком, который записывает данные о лицензиях в таблицу `software_license`.
-
----
-## Описание работы
-
-1. **KafkaListener** слушает топик `software-licenses`  
-   • сохраняет сообщение в `outbox_event`
-
-2. **OutboxScheduler** каждые 5 секунд:  
-   • читает необработанные события,  
-   • преобразует их в `SoftwareLicenseEntity`,  
-   • сохраняет/обновляет данные о лицензии,  
-   • помечает событие как обработанное.
-
-3. **Ежедневная очистка** (`03:00`)  
-   • удаляет старые обработанные события старше `outbox.retention-days` (7 дней).
+Сервис принимает сообщения из Kafka, сохраняет их в таблицу outbox_event и поддерживает работу с лицензиями ПО.
 
 ---
 
@@ -26,27 +10,24 @@
 ```bash
 mvn clean package -DskipTests
 ```
+После сборки появится:
+
+```bash
+target/license-event-outbox-1.0.0.jar
+```
+
 ### Запуск через Docker Compose
 ```bash
 docker-compose up --build
 ```
-### REST API
-
-**POST** /api/licenses
-
-Отправляет JSON с лицензией в outbox_event
-
-**Пример запроса:**
-```bash
-curl -X POST http://localhost:8080/api/licenses \
-  -H "Content-Type: application/json" \
-  -d '{
-        "licenseId": "LIC-100",
-        "softwareName": "Figma",
-        "owner": "Victoria",
-        "expiresAt": "2026-05-01"
-      }'
-```
+| Сервис          | Порт        | Описание               |
+|-----------------|-------------|-------------------------|
+| PostgreSQL      | 5432        | база данных             |
+| Kafka           | 9092/29092  | брокер Kafka            |
+| Zookeeper       | 2181        | сервис координатора     |
+| License Service | 8080        | наше приложение         |
+| Kafka UI        | 8081        | веб-интерфейс Kafka     |
+ 
 ### Проверка работы паттерна Outbox
 1. Проверить таблицу outbox_event:
 ```sql
