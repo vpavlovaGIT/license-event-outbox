@@ -56,6 +56,8 @@ public class LicenseKafkaIntegrationTest {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+
+        registry.add("app.kafka-topic", () -> "software-licenses");
     }
 
     @Test

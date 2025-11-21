@@ -24,7 +24,7 @@ spring:
     show-sql: true
     open-in-view: true
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP-SERVERS:localhost:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: license-service
       auto-offset-reset: earliest
